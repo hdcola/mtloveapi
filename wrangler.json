@@ -16,6 +16,12 @@
 			"database_name": "mtlove",
 			"database_id": "dddda769-dc45-4bb4-96c2-bdca17c32edc"
 		}
+	],
+	"routers": [
+		{
+			"pattern": "mtloveapi.hdcola.org",
+			"custom_domain": true
+		}
 	]
 	/**
 	 * Smart Placement

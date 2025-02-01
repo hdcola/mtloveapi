@@ -1,6 +1,7 @@
 name = "mtloveapi"
 main = "worker.js"
 compatibility_date = "2023-08-23"
+routes = [{pattern="mtloveapi.hdcola.org", custom_domain=true}]
 
 [unsafe.metadata.observability]
 enabled = true
