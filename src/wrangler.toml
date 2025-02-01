@@ -4,3 +4,8 @@ compatibility_date = "2023-08-23"
 
 [unsafe.metadata.observability]
 enabled = true
+
+[[d1_databases]]
+binding = "DB" # available in your Worker on env.DB
+database_name = "mtlove"
+database_id = "dddda769-dc45-4bb4-96c2-bdca17c32edc"

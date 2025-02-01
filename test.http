@@ -1,0 +1,10 @@
+@host=http://localhost:8787
+
+### GET /
+GET {{host}} HTTP/1.1
+
+### get all scenarios
+GET {{host}}/api/scenarios HTTP/1.1
+
+### get a scenario by id
+GET {{host}}/api/scenarios/1 HTTP/1.1
