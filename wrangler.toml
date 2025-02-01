@@ -3,6 +3,10 @@ main = "src/worker.js"
 compatibility_date = "2025-02-01"
 workers_dev = true
 preview_urls = false
+routes = [
+	{ pattern="mtloveapi.hdcola.org", custom_domain=true}
+]
+
 
 [observability]
 enabled = true
