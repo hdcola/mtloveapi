@@ -13,6 +13,32 @@ export default {
 		const { pathname } = new URL(request.url);
 		const method = request.method;
 
+		const corsHeaders = {
+			'Access-Control-Allow-Origin': '*',
+			'Access-Control-Allow-Methods': 'GET,HEAD,POST,PUT,DELETE,OPTIONS',
+			'Access-Control-Max-Age': '86400',
+		};
+
+		// Handle OPTIONS request for CORS preflight
+		if (method === 'OPTIONS') {
+			return new Response(null, {
+				headers: corsHeaders,
+			});
+		}
+
+		// Helper function to add CORS headers to responses
+		const corsResponse = (response) => {
+			const headers = new Headers(response.headers);
+			Object.entries(corsHeaders).forEach(([key, value]) => {
+				headers.set(key, value);
+			});
+			return new Response(response.body, {
+				status: response.status,
+				statusText: response.statusText,
+				headers,
+			});
+		};
+
 		// Verify auth token for protected endpoints
 		const verifyAuth = (request) => {
 			const authHeader = request.headers.get('Authorization');
@@ -22,13 +48,13 @@ export default {
 		// Get all scenarios
 		if (pathname === '/api/scenarios' && method === 'GET') {
 			const { results } = await env.DB.prepare('SELECT * FROM scenarios').all();
-			return Response.json(results);
+			return corsResponse(Response.json(results));
 		}
 
 		// Create new scenario
 		if (pathname === '/api/scenarios' && method === 'POST') {
 			if (!verifyAuth(request)) {
-				return new Response('Unauthorized', { status: 401 });
+				return corsResponse(new Response('Unauthorized', { status: 401 }));
 			}
 			try {
 				const data = await request.json();
@@ -37,11 +63,11 @@ export default {
 					.run();
 
 				if (success) {
-					return new Response('Scenario created successfully', { status: 201 });
+					return corsResponse(new Response('Scenario created successfully', { status: 201 }));
 				}
-				return new Response('Failed to create scenario', { status: 500 });
+				return corsResponse(new Response('Failed to create scenario', { status: 500 }));
 			} catch (error) {
-				return new Response('Invalid request data', { status: 400 });
+				return corsResponse(new Response('Invalid request data', { status: 400 }));
 			}
 		}
 
@@ -54,15 +80,15 @@ export default {
 			if (method === 'GET') {
 				const { results } = await env.DB.prepare('SELECT * FROM scenarios WHERE id = ?').bind(id).all();
 				if (results && results.length > 0) {
-					return Response.json(results[0]);
+					return corsResponse(Response.json(results[0]));
 				}
-				return new Response('Scenario not found', { status: 404 });
+				return corsResponse(new Response('Scenario not found', { status: 404 }));
 			}
 
 			// update scenario by ID
 			if (method === 'PUT') {
 				if (!verifyAuth(request)) {
-					return new Response('Unauthorized', { status: 401 });
+					return corsResponse(new Response('Unauthorized', { status: 401 }));
 				}
 				try {
 					const data = await request.json();
@@ -71,28 +97,28 @@ export default {
 						.run();
 
 					if (success) {
-						return new Response('Scenario updated successfully', { status: 200 });
+						return corsResponse(new Response('Scenario updated successfully', { status: 200 }));
 					}
-					return new Response('Failed to update scenario', { status: 500 });
+					return corsResponse(new Response('Failed to update scenario', { status: 500 }));
 				} catch (error) {
-					return new Response('Invalid request data', { status: 400 });
+					return corsResponse(new Response('Invalid request data', { status: 400 }));
 				}
 			}
 
 			// delete scenario by ID
 			if (method === 'DELETE') {
 				if (!verifyAuth(request)) {
-					return new Response('Unauthorized', { status: 401 });
+					return corsResponse(new Response('Unauthorized', { status: 401 }));
 				}
 				const { success } = await env.DB.prepare('DELETE FROM scenarios WHERE id = ?').bind(id).run();
 
 				if (success) {
-					return new Response('Scenario deleted successfully', { status: 200 });
+					return corsResponse(new Response('Scenario deleted successfully', { status: 200 }));
 				}
-				return new Response('Failed to delete scenario', { status: 500 });
+				return corsResponse(new Response('Failed to delete scenario', { status: 500 }));
 			}
 		}
 
-		return new Response('Not found', { status: 404 });
+		return corsResponse(new Response('Not found', { status: 404 }));
 	},
 };
